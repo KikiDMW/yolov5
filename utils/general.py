@@ -32,10 +32,10 @@ cv2.setNumThreads(0)  # prevent OpenCV from multithreading (incompatible with Py
 os.environ['NUMEXPR_MAX_THREADS'] = str(min(os.cpu_count(), 8))  # NumExpr max threads
 
 
-def set_logging(rank=-1):
+def set_logging(rank=-1, verbose=True):
     logging.basicConfig(
         format="%(message)s",
-        level=logging.INFO if rank in [-1, 0] else logging.WARN)
+        level=logging.INFO if (verbose and rank in [-1, 0]) else logging.WARN)
 
 
 def init_seeds(seed=0):
@@ -117,8 +117,8 @@ def check_requirements(requirements='requirements.txt', exclude=()):
             pkg.require(r)
         except Exception as e:  # DistributionNotFound or VersionConflict if requirements not met
             n += 1
-            print(f"{prefix} {e.req} not found and is required by YOLOv5, attempting auto-update...")
-            print(subprocess.check_output(f"pip install {e.req}", shell=True).decode())
+            print(f"{prefix} {r} not found and is required by YOLOv5, attempting auto-update...")
+            print(subprocess.check_output(f"pip install '{r}'", shell=True).decode())
 
     if n:  # if packages updated
         source = file.resolve() if 'file' in locals() else requirements
